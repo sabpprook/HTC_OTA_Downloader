@@ -32,7 +32,6 @@ namespace HTC_OTA_Downloader
             if (button_get.Tag.ToString() == "STOP")
             {
                 web.CancelAsync();
-                button_get.Tag = button_get.Text = "GET";
                 return;
             }
 
@@ -52,19 +51,23 @@ namespace HTC_OTA_Downloader
                 if (check_curl.Checked)
                 {
                     text_log.Text = Funcs.GetCurlCommand(obj);
+                    System.Media.SystemSounds.Asterisk.Play();
                 }
                 else
                 {
                     var result = MessageBox.Show(pkg, "Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk);
                     if (result == DialogResult.OK)
                     {
-                        this.Text = pkg;
                         web = Funcs.DonwloadPackage(obj);
-
-                        web.DownloadProgressChanged += (_s, _e) => progressBar.Value = _e.ProgressPercentage;
+                        web.DownloadProgressChanged += (_s, _e) =>
+                        {
+                            progressBar.Value = _e.ProgressPercentage;
+                            this.Text = $"[{progressBar.Value}%] {pkg}";
+                        };
                         web.DownloadFileCompleted += (_s, _e) =>
                         {
                             this.Text = "HTC OTA Downloader";
+                            button_get.Tag = button_get.Text = "GET";
                             System.Media.SystemSounds.Asterisk.Play();
                             progressBar.Value = 0;
                         };
