@@ -100,7 +100,6 @@
             this.text_cidnum.Name = "text_cidnum";
             this.text_cidnum.Size = new System.Drawing.Size(314, 26);
             this.text_cidnum.TabIndex = 2;
-            this.text_cidnum.Text = "HTC__621";
             this.text_cidnum.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.text_cidnum.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_info_KeyDown);
             // 
@@ -113,7 +112,6 @@
             this.text_version.Name = "text_version";
             this.text_version.Size = new System.Drawing.Size(314, 26);
             this.text_version.TabIndex = 1;
-            this.text_version.Text = "2.41.709.73";
             this.text_version.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.text_version.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_info_KeyDown);
             // 
@@ -126,7 +124,6 @@
             this.text_model.Name = "text_model";
             this.text_model.Size = new System.Drawing.Size(314, 26);
             this.text_model.TabIndex = 0;
-            this.text_model.Text = "htc_pmeuhl";
             this.text_model.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.text_model.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_info_KeyDown);
             // 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -16,6 +17,8 @@ namespace HTC_OTA_Downloader
     {
         JavaScriptSerializer serializer = Funcs.serializer;
         WebClient web = new WebClient();
+        string model, version, cidnum;
+        bool isChina, isCurl;
 
         public fmGUI()
         {
@@ -25,6 +28,12 @@ namespace HTC_OTA_Downloader
         private void fmGUI_Load(object sender, EventArgs e)
         {
             ActiveControl = text_log;
+            Config.Load(out model, out version, out cidnum, out isChina, out isCurl);
+            text_model.Text = model;
+            text_version.Text = version;
+            text_cidnum.Text = cidnum;
+            check_china.Checked = isChina;
+            check_curl.Checked = isCurl;
         }
 
         private async void button_get_Click(object sender, EventArgs e)
@@ -35,10 +44,11 @@ namespace HTC_OTA_Downloader
                 return;
             }
 
-            var isChina = check_china.Checked;
-            var model = text_model.Text;
-            var version = text_version.Text;
-            var cidnum = text_cidnum.Text;
+            model = text_model.Text;
+            version = text_version.Text;
+            cidnum = text_cidnum.Text;
+            isChina = check_china.Checked;
+            isCurl = check_curl.Checked;
 
             var json = await Task.Run(() => Funcs.CheckinJson(isChina, model, version, cidnum));
             var obj = serializer.Deserialize<Response>(json);
@@ -46,9 +56,10 @@ namespace HTC_OTA_Downloader
             
             if (obj.intent != null && obj.intent[0].data_uri != null)
             {
+                Config.Save(model, version, cidnum, isChina, isCurl);
                 var url = obj.intent[0].data_uri;
                 var pkg = obj.intent[0].pkgFileName;
-                if (check_curl.Checked)
+                if (isCurl)
                 {
                     text_log.Text = Funcs.GetCurlCommand(obj);
                     System.Media.SystemSounds.Asterisk.Play();
@@ -70,6 +81,7 @@ namespace HTC_OTA_Downloader
                             button_get.Tag = button_get.Text = "GET";
                             System.Media.SystemSounds.Asterisk.Play();
                             progressBar.Value = 0;
+                            if (_e.Cancelled) File.Delete(pkg);
                         };
                         web.DownloadFileAsync(new Uri(url), pkg);
                         button_get.Tag = button_get.Text = "STOP";
