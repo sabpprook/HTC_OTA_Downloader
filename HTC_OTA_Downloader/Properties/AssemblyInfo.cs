@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HTC Flash Zone")]
 [assembly: AssemblyProduct("HTC OTA Downloader")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright © 2018 HTC Flash Zone. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 下列 GUID 為專案公開 (Expose) 至 COM 時所要使用的 typelib ID
-[assembly: Guid("4c7a0176-1bf1-49da-9c95-9c61a6ea738c")]
+[assembly: Guid("a9cca90b-f141-45c9-b00c-8f313db812ec")]
 
 // 組件的版本資訊由下列四個值所組成: 
 //

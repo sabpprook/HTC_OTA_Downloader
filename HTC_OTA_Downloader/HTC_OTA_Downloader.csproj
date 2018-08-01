@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4C7A0176-1BF1-49DA-9C95-9C61A6EA738C}</ProjectGuid>
+    <ProjectGuid>{A9CCA90B-F141-45C9-B00C-8F313DB812EC}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HTC_OTA_Downloader</RootNamespace>
@@ -47,10 +47,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="fmGUI.cs" />
+    <Compile Include="fmGUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="fmGUI.Designer.cs">
       <DependentUpon>fmGUI.cs</DependentUpon>
     </Compile>
+    <Compile Include="FakeDevice.cs" />
+    <Compile Include="Funcs.cs" />
+    <Compile Include="Request.cs" />
+    <Compile Include="Response.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="fmGUI.resx">
