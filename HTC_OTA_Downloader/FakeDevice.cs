@@ -11,21 +11,21 @@ namespace HTC_OTA_Downloader
         public string SN { get; private set; }
         public string IMEI { get; private set; }
 
-        static string[] Factory = { "FA", "HT" };
+        static string[] Factory = { "FA", "HT", "LC", "HQ", "CC", "SH" };
         static string[] Model = { "WM", "YJ", "BN", "18" }; // M8, M9, 10, U11
         static string[] TAC_FAC = { "35871605", "35722606", "35426107", "35613308" };
         static Random RND = new Random(DateTime.Now.Millisecond);
 
         public FakeDevice()
         {
-            var index = RND.Next(0, 3);
-            var dt = DateTimeOffset.Parse("2014-06-01").AddYears(index).AddDays(RND.Next(1, 500));
+            var index = RND.Next(0, Model.Length);
+            var dt = DateTimeOffset.Parse("2014-03-01").AddYears(index).AddDays(RND.Next(1, 500));
 
             var sn = "";
-            sn += Factory[RND.Next(0, 1)];
+            sn += Factory[RND.Next(0, Factory.Length)];
             sn += Int2Char(dt.Year - 2010) + Int2Char(dt.Month) + Int2Char(dt.Day);
             sn += Model[index];
-            sn += RND.Next(1, 9999).ToString("D5");
+            sn += RND.Next(1, 10000).ToString("D5");
 
             var imei = "";
             imei += TAC_FAC[index];
