@@ -11,7 +11,7 @@ namespace HTC_OTA_Downloader
     {
         private static RegistryKey Reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).CreateSubKey("HTCFZ\\HTC OTA Downloader");
 
-        public static void Load(out string model, out string version, out string cidnum, out bool isChina, out bool isCurl)
+        public static void DL_Load(out string model, out string version, out string cidnum, out bool isChina, out bool isCurl)
         {
             model = (string)Reg.GetValue("Model", "htc_pmeuhl");
             version = (string)Reg.GetValue("Version", "2.41.709.73");
@@ -20,13 +20,27 @@ namespace HTC_OTA_Downloader
             isCurl = (string)Reg.GetValue("isCurl", "0") == "1" ? true : false;
         }
 
-        public static void Save(string model, string version, string cidnum, bool isChina, bool isCurl)
+        public static void DL_Save(string model, string version, string cidnum, bool isChina, bool isCurl)
         {
             Reg.SetValue("Model", model, RegistryValueKind.String);
             Reg.SetValue("Version", version, RegistryValueKind.String);
             Reg.SetValue("CID", cidnum, RegistryValueKind.String);
             Reg.SetValue("isChina", isChina ? "1" : "0", RegistryValueKind.String);
             Reg.SetValue("isCurl", isCurl ? "1" : "0", RegistryValueKind.String);
+        }
+
+        public static void BFC_Load(out string model, out string sku, out string cidnum)
+        {
+            model = (string)Reg.GetValue("Model2", "htc_pmeuhl");
+            sku = (string)Reg.GetValue("SKU", "709");
+            cidnum = (string)Reg.GetValue("CID2", "HTC__621");
+        }
+
+        public static void BFC_Save(string model, string sku, string cidnum)
+        {
+            Reg.SetValue("Model2", model, RegistryValueKind.String);
+            Reg.SetValue("SKU", sku, RegistryValueKind.String);
+            Reg.SetValue("CID2", cidnum, RegistryValueKind.String);
         }
     }
 }
