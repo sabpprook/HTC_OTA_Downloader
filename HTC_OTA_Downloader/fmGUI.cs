@@ -17,8 +17,6 @@ namespace HTC_OTA_Downloader
     {
         JavaScriptSerializer serializer = Funcs.serializer;
         WebClient web = new WebClient();
-        string model, version, sku, cidnum;
-        bool isChina, isCurl;
 
         public fmGUI()
         {
@@ -27,6 +25,8 @@ namespace HTC_OTA_Downloader
 
         private void fmGUI_Load(object sender, EventArgs e)
         {
+            string model, version, cidnum, sku;
+            bool isChina, isCurl;
             ActiveControl = text_dl_log;
             Config.DL_Load(out model, out version, out cidnum, out isChina, out isCurl);
             text_dl_model.Text = model;
@@ -48,11 +48,11 @@ namespace HTC_OTA_Downloader
                 return;
             }
 
-            model = text_dl_model.Text;
-            version = text_dl_version.Text;
-            cidnum = text_dl_cidnum.Text;
-            isChina = check_dl_china.Checked;
-            isCurl = check_dl_curl.Checked;
+            var model = text_dl_model.Text;
+            var version = text_dl_version.Text;
+            var cidnum = text_dl_cidnum.Text;
+            var isChina = check_dl_china.Checked;
+            var isCurl = check_dl_curl.Checked;
 
             if (string.IsNullOrEmpty(model) || string.IsNullOrEmpty(version) || string.IsNullOrEmpty(cidnum))
             {
@@ -133,9 +133,9 @@ namespace HTC_OTA_Downloader
                 return;
             }
 
-            model = text_bfc_model.Text;
-            sku = text_bfc_sku.Text;
-            cidnum = text_bfc_cidnum.Text;
+            var model = text_bfc_model.Text;
+            var sku = text_bfc_sku.Text;
+            var cidnum = text_bfc_cidnum.Text;
 
             if (string.IsNullOrEmpty(model) || string.IsNullOrEmpty(sku) || string.IsNullOrEmpty(cidnum))
             {
@@ -155,7 +155,7 @@ namespace HTC_OTA_Downloader
             var sku_str = sku.Split(':')[1];
 
             var sku_int = int.Parse(sku_str, System.Globalization.NumberStyles.Integer);
-            isChina = (sku_int >= 1400 && sku_int <= 1405);
+            var isChina = (sku_int >= 1400 && sku_int <= 1405);
 
             button_bfc_check.Tag = button_bfc_check.Text = "Suspend";
             text_bfc_log.Text = "";
@@ -172,7 +172,7 @@ namespace HTC_OTA_Downloader
                         break;
                     }
 
-                    version = $"{head_ver}.{i.ToString("D2")}.{sku_str}.{j}";
+                    var version = $"{head_ver}.{i.ToString("D2")}.{sku_str}.{j}";
                     var str = $"{model}\t{version}\t{cidnum}";
 
                     this.Text = $"Brute-Force: {str.Replace("\t", " / ")}";
