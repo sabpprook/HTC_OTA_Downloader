@@ -32,7 +32,7 @@ namespace HTC_OTA_Downloader
         public static void BFC_Load(out string model, out string sku, out string cidnum)
         {
             model = (string)Reg.GetValue("Model2", "htc_pmeuhl");
-            sku = (string)Reg.GetValue("SKU", "709");
+            sku = (string)Reg.GetValue("SKU", "1:709");
             cidnum = (string)Reg.GetValue("CID2", "HTC__621");
         }
 

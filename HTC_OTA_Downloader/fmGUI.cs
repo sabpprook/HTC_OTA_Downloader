@@ -129,7 +129,7 @@ namespace HTC_OTA_Downloader
         {
             if (button_bfc_check.Tag.ToString() == "Suspend")
             {
-                button_bfc_check.Tag = "Check";
+                button_bfc_check.Tag = button_bfc_check.Text = "Check";
                 return;
             }
 
@@ -144,18 +144,39 @@ namespace HTC_OTA_Downloader
                 return;
             }
 
-            var sku_int = int.Parse(sku, System.Globalization.NumberStyles.Integer);
+            if (!sku.Contains(":"))
+            {
+                text_bfc_log.Text = "Error: SKU field should be this format X:XXXX";
+                System.Media.SystemSounds.Asterisk.Play();
+                return;
+            }
+
+            var head_ver = sku.Split(':')[0];
+            var sku_str = sku.Split(':')[1];
+
+            var sku_int = int.Parse(sku_str, System.Globalization.NumberStyles.Integer);
             isChina = (sku_int >= 1400 && sku_int <= 1405);
 
             button_bfc_check.Tag = button_bfc_check.Text = "Suspend";
             text_bfc_log.Text = "";
 
+            var is_Suspend = false;
+
             for (int i = 0; i < 100; i++)
             {
                 for (int j = 0; j < 30; j++)
                 {
-                    version = $"1.{i.ToString("D2")}.{sku}.{j}";
-                    text_bfc_log.AppendText($"Check - {model} / {version} / {cidnum}\r\n");
+                    if (button_bfc_check.Tag.ToString() == "Check")
+                    {
+                        is_Suspend = true;
+                        break;
+                    }
+
+                    version = $"{head_ver}.{i.ToString("D2")}.{sku_str}.{j}";
+                    var str = $"{model}\t{version}\t{cidnum}";
+
+                    this.Text = $"Brute-Force: {str.Replace("\t", " / ")}";
+                    text_bfc_log.AppendText($"Check: {str}\r\n");
 
                     var json = await Task.Run(() => Funcs.CheckinJson(isChina, model, version, cidnum));
                     var obj = serializer.Deserialize<Response>(json);
@@ -166,28 +187,32 @@ namespace HTC_OTA_Downloader
                         if (obj.reason == "FOTACANCEL_NO_MATCH_PRODUCT")
                         {
                             text_bfc_log.Text = "Error: Model name not vaild!";
-                            button_bfc_check.Tag = "Check";
+                            is_Suspend = true;
                         }
                         if (obj.reason == "FOTACANCEL_NO_MATCH_SKU")
                         {
                             text_bfc_log.Text = "Error: SKU not vaild!";
-                            button_bfc_check.Tag = "Check";
+                            is_Suspend = true;
                         }
                         if (obj.reason == "FOTAUPDATE_NO_ERROR")
                         {
                             text_bfc_log.Text = $"Found: {model} / {version} / {cidnum}";
-                            button_bfc_check.Tag = "Check";
+                            is_Suspend = true;
                         }
                     }
-
-                    if (button_bfc_check.Tag.ToString() == "Check")
-                    {
-                        button_bfc_check.Text = "Check";
-                        System.Media.SystemSounds.Asterisk.Play();
-                        return;
-                    }
+                    if (is_Suspend) break;
                 }
+                if (is_Suspend) break;
             }
+
+            if (!is_Suspend)
+            {
+                text_bfc_log.Text = "No OTA package found!";
+            }
+
+            this.Text = "HTC OTA Downloader";
+            button_bfc_check.Tag = button_bfc_check.Text = "Check";
+            System.Media.SystemSounds.Asterisk.Play();
         }
 
         private void text_bfc_info_KeyDown(object sender, KeyEventArgs e)
