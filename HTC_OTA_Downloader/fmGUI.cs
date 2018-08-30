@@ -125,11 +125,11 @@ namespace HTC_OTA_Downloader
             }
         }
 
-        private async void btn_bfc_check_Click(object sender, EventArgs e)
+        private async void button_bfc_check_Click(object sender, EventArgs e)
         {
-            if (btn_bfc_check.Tag.ToString() == "Suspend")
+            if (button_bfc_check.Tag.ToString() == "Suspend")
             {
-                btn_bfc_check.Tag = "Check";
+                button_bfc_check.Tag = "Check";
                 return;
             }
 
@@ -147,7 +147,7 @@ namespace HTC_OTA_Downloader
             var sku_int = int.Parse(sku, System.Globalization.NumberStyles.Integer);
             isChina = (sku_int >= 1400 && sku_int <= 1405);
 
-            btn_bfc_check.Tag = btn_bfc_check.Text = "Suspend";
+            button_bfc_check.Tag = button_bfc_check.Text = "Suspend";
             text_bfc_log.Text = "";
 
             for (int i = 0; i < 100; i++)
@@ -166,27 +166,36 @@ namespace HTC_OTA_Downloader
                         if (obj.reason == "FOTACANCEL_NO_MATCH_PRODUCT")
                         {
                             text_bfc_log.Text = "Error: Model name not vaild!";
-                            btn_bfc_check.Tag = "Check";
+                            button_bfc_check.Tag = "Check";
                         }
                         if (obj.reason == "FOTACANCEL_NO_MATCH_SKU")
                         {
                             text_bfc_log.Text = "Error: SKU not vaild!";
-                            btn_bfc_check.Tag = "Check";
+                            button_bfc_check.Tag = "Check";
                         }
                         if (obj.reason == "FOTAUPDATE_NO_ERROR")
                         {
                             text_bfc_log.Text = $"Found: {model} / {version} / {cidnum}";
-                            btn_bfc_check.Tag = "Check";
+                            button_bfc_check.Tag = "Check";
                         }
                     }
 
-                    if (btn_bfc_check.Tag.ToString() == "Check")
+                    if (button_bfc_check.Tag.ToString() == "Check")
                     {
-                        btn_bfc_check.Text = "Check";
+                        button_bfc_check.Text = "Check";
                         System.Media.SystemSounds.Asterisk.Play();
                         return;
                     }
                 }
+            }
+        }
+
+        private void text_bfc_info_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.Enter)
+            {
+                ActiveControl = button_bfc_check;
+                button_bfc_check_Click(sender, e);
             }
         }
     }

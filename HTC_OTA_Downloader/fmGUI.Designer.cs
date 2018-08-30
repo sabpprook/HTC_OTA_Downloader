@@ -47,7 +47,7 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.text_bfc_log = new System.Windows.Forms.TextBox();
-            this.btn_bfc_check = new System.Windows.Forms.Button();
+            this.button_bfc_check = new System.Windows.Forms.Button();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.text_bfc_cidnum = new System.Windows.Forms.TextBox();
             this.text_bfc_sku = new System.Windows.Forms.TextBox();
@@ -308,7 +308,7 @@
             this.tableLayoutPanel5.ColumnCount = 1;
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.Controls.Add(this.text_bfc_log, 0, 1);
-            this.tableLayoutPanel5.Controls.Add(this.btn_bfc_check, 0, 0);
+            this.tableLayoutPanel5.Controls.Add(this.button_bfc_check, 0, 0);
             this.tableLayoutPanel5.Location = new System.Drawing.Point(6, 132);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 2;
@@ -333,18 +333,18 @@
             this.text_bfc_log.Size = new System.Drawing.Size(433, 299);
             this.text_bfc_log.TabIndex = 1;
             // 
-            // btn_bfc_check
+            // button_bfc_check
             // 
-            this.btn_bfc_check.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.button_bfc_check.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_bfc_check.Location = new System.Drawing.Point(3, 3);
-            this.btn_bfc_check.Name = "btn_bfc_check";
-            this.btn_bfc_check.Size = new System.Drawing.Size(433, 54);
-            this.btn_bfc_check.TabIndex = 0;
-            this.btn_bfc_check.Tag = "Check";
-            this.btn_bfc_check.Text = "Check";
-            this.btn_bfc_check.UseVisualStyleBackColor = true;
-            this.btn_bfc_check.Click += new System.EventHandler(this.btn_bfc_check_Click);
+            this.button_bfc_check.Location = new System.Drawing.Point(3, 3);
+            this.button_bfc_check.Name = "button_bfc_check";
+            this.button_bfc_check.Size = new System.Drawing.Size(433, 54);
+            this.button_bfc_check.TabIndex = 0;
+            this.button_bfc_check.Tag = "Check";
+            this.button_bfc_check.Text = "Check";
+            this.button_bfc_check.UseVisualStyleBackColor = true;
+            this.button_bfc_check.Click += new System.EventHandler(this.button_bfc_check_Click);
             // 
             // tableLayoutPanel4
             // 
@@ -377,8 +377,9 @@
             this.text_bfc_cidnum.MaxLength = 10;
             this.text_bfc_cidnum.Name = "text_bfc_cidnum";
             this.text_bfc_cidnum.Size = new System.Drawing.Size(343, 26);
-            this.text_bfc_cidnum.TabIndex = 3;
+            this.text_bfc_cidnum.TabIndex = 2;
             this.text_bfc_cidnum.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.text_bfc_cidnum.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_bfc_info_KeyDown);
             // 
             // text_bfc_sku
             // 
@@ -389,8 +390,9 @@
             this.text_bfc_sku.MaxLength = 10;
             this.text_bfc_sku.Name = "text_bfc_sku";
             this.text_bfc_sku.Size = new System.Drawing.Size(343, 26);
-            this.text_bfc_sku.TabIndex = 2;
+            this.text_bfc_sku.TabIndex = 1;
             this.text_bfc_sku.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.text_bfc_sku.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_bfc_info_KeyDown);
             // 
             // label4
             // 
@@ -434,8 +436,9 @@
             this.text_bfc_model.MaxLength = 20;
             this.text_bfc_model.Name = "text_bfc_model";
             this.text_bfc_model.Size = new System.Drawing.Size(343, 26);
-            this.text_bfc_model.TabIndex = 5;
+            this.text_bfc_model.TabIndex = 0;
             this.text_bfc_model.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.text_bfc_model.KeyDown += new System.Windows.Forms.KeyEventHandler(this.text_bfc_info_KeyDown);
             // 
             // fmGUI
             // 
@@ -493,7 +496,7 @@
         private System.Windows.Forms.TextBox text_bfc_sku;
         private System.Windows.Forms.TextBox text_bfc_model;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.Button btn_bfc_check;
+        private System.Windows.Forms.Button button_bfc_check;
         private System.Windows.Forms.TextBox text_bfc_log;
     }
 }
