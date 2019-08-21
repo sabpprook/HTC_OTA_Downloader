@@ -34,7 +34,7 @@ namespace HTC
                     result += json[i];
                     result += newline(space_count);
                 }
-                else if (json[i] == ',')
+                else if (json[i] == ',' && (json[i + 1] == '"' || json[i + 1] == '{'))
                 {
                     result += json[i];
                     result += newline(space_count);
