@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29020.237
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTC_OTA_Downloader", "HTC_OTA_Downloader\HTC_OTA_Downloader.csproj", "{A9CCA90B-F141-45C9-B00C-8F313DB812EC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTC_OTA_Downloader", "HTC_OTA_Downloader\HTC_OTA_Downloader.csproj", "{7A47584F-463B-454E-A05D-F1535E2EA045}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A9CCA90B-F141-45C9-B00C-8F313DB812EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9CCA90B-F141-45C9-B00C-8F313DB812EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9CCA90B-F141-45C9-B00C-8F313DB812EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9CCA90B-F141-45C9-B00C-8F313DB812EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A47584F-463B-454E-A05D-F1535E2EA045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A47584F-463B-454E-A05D-F1535E2EA045}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A47584F-463B-454E-A05D-F1535E2EA045}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A47584F-463B-454E-A05D-F1535E2EA045}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3F955FB0-D26B-4D46-A3A2-4F53AA1E0A53}
 	EndGlobalSection
 EndGlobal

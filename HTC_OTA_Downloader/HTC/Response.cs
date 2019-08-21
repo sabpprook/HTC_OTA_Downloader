@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HTC_OTA_Downloader
+namespace HTC
 {
     public class Response
     {

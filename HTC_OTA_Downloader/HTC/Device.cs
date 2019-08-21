@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HTC_OTA_Downloader
+namespace HTC
 {
-    public class FakeDevice
+    public class Device
     {
+
         public string SN { get; private set; }
         public string IMEI { get; private set; }
 
@@ -16,7 +17,7 @@ namespace HTC_OTA_Downloader
         static string[] TAC_FAC = { "35871605", "35722606", "35426107", "35613308" };
         static Random RND = new Random(DateTime.Now.Millisecond);
 
-        public FakeDevice()
+        public Device()
         {
             var index = RND.Next(0, Model.Length);
             var dt = DateTimeOffset.Parse("2014-03-01").AddYears(index).AddDays(RND.Next(1, 500));

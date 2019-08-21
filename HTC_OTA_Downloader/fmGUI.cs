@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
-namespace HTC_OTA_Downloader
+namespace HTCFZ.HTC_OTA_Downloader
 {
     public partial class fmGUI : Form
     {
-        JavaScriptSerializer serializer = Funcs.serializer;
         WebClient web = new WebClient();
 
         public fmGUI()
@@ -23,109 +22,106 @@ namespace HTC_OTA_Downloader
             InitializeComponent();
         }
 
-        private void fmGUI_Load(object sender, EventArgs e)
+        private void FmGUI_Load(object sender, EventArgs e)
         {
-            string model, version, cidnum, sku;
-            bool isChina, isCurl;
-            ActiveControl = text_dl_log;
-            Config.DL_Load(out model, out version, out cidnum, out isChina, out isCurl);
-            text_dl_model.Text = model;
-            text_dl_version.Text = version;
-            text_dl_cidnum.Text = cidnum;
-            check_dl_china.Checked = isChina;
-            check_dl_curl.Checked = isCurl;
-            Config.BFC_Load(out model, out sku, out cidnum);
+            ServicePointManager.DefaultConnectionLimit = 16;
+            text_device_locale.Text = CultureInfo.CurrentCulture.Name.Replace("-", "_");
+
+            string model, version, cidnum, taskid, main, sku;
+            bool isChina, isCURL;
+
+            HTC.Config.DL_Load(out model, out version, out cidnum, out taskid, out isChina, out isCURL);
+            text_device_model.Text = model;
+             text_device_version.Text= version;
+            text_device_cid.Text= cidnum;
+            text_device_taskid.Text= taskid;
+
+            HTC.Config.BFC_Load(out model, out main, out sku, out cidnum);
             text_bfc_model.Text = model;
+            text_bfc_main.Text = main;
             text_bfc_sku.Text = sku;
-            text_bfc_cidnum.Text = cidnum;
+            text_bfc_cid.Text = cidnum;
         }
 
-        private async void button_dl_get_Click(object sender, EventArgs e)
+        private async void Button_get_info_Click(object sender, EventArgs e)
         {
-            if (button_dl_get.Tag.ToString() == "STOP")
+            if (button_get_info.Tag.ToString() == "STOP")
             {
                 web.CancelAsync();
                 return;
             }
 
-            var model = text_dl_model.Text;
-            var version = text_dl_version.Text;
-            var cidnum = text_dl_cidnum.Text;
-            var isChina = check_dl_china.Checked;
-            var isCurl = check_dl_curl.Checked;
+            var model = text_device_model.Text;
+            var version = text_device_version.Text;
+            var cidnum = text_device_cid.Text;
+            var taskid = text_device_taskid.Text;
+            var locale = text_device_locale.Text;
+
+            var isChina = check_option_china.Checked;
+            var isCURL = check_option_curl.Checked;
 
             if (string.IsNullOrEmpty(model) || string.IsNullOrEmpty(version) || string.IsNullOrEmpty(cidnum))
             {
-                text_dl_log.Text = "Error: device informations are required!";
+                text_main.Text = "Error: Important device informations are missing!";
                 System.Media.SystemSounds.Asterisk.Play();
                 return;
             }
 
-            var json = await Task.Run(() => Funcs.CheckinJson(isChina, model, version, cidnum));
-            var obj = serializer.Deserialize<Response>(json);
-            text_dl_log.Text = json;
+            button_get_info.Enabled = false;
 
-            if (obj.intent != null && obj.intent[0].data_uri != null)
+            var json = await Task.Run(() => HTC.Utils.CheckinJson(model, version, cidnum, taskid, locale, isChina));
+            var resp = HTC.Json.GetResponseObject(json);
+
+            button_get_info.Enabled = true;
+
+            text_main.Text = HTC.Json.GetString(json);
+
+            if (resp.intent == null || resp.intent[0].data_uri == null)
             {
-                Config.DL_Save(model, version, cidnum, isChina, isCurl);
-                var url = obj.intent[0].data_uri;
-                var pkg = obj.intent[0].pkgFileName;
-                if (isCurl)
-                {
-                    text_dl_log.Text = Funcs.GetCurlCommand(obj);
-                    System.Media.SystemSounds.Asterisk.Play();
-                }
-                else
-                {
-                    var result = MessageBox.Show(pkg, "Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk);
-                    if (result == DialogResult.OK)
-                    {
-                        web = Funcs.DonwloadPackage(obj);
-                        web.DownloadProgressChanged += (_s, _e) =>
-                        {
-                            progressBar.Value = _e.ProgressPercentage;
-                            this.Text = $"[{progressBar.Value}%] {pkg}";
-                        };
-                        web.DownloadFileCompleted += (_s, _e) =>
-                        {
-                            this.Text = "HTC OTA Downloader";
-                            button_dl_get.Tag = button_dl_get.Text = "GET";
-                            System.Media.SystemSounds.Asterisk.Play();
-                            progressBar.Value = 0;
-                            if (_e.Cancelled) File.Delete(pkg);
-                        };
-                        web.DownloadFileAsync(new Uri(url), pkg);
-                        button_dl_get.Tag = button_dl_get.Text = "STOP";
-                    }
-                }
+                button_get_info.Enabled = true;
+                return;
             }
+
+            HTC.Config.DL_Save(model, version, cidnum, taskid, isChina, isCURL);
+            File.WriteAllText("OTA.json", text_main.Text);
+
+            if (isCURL)
+            {
+                text_main.Text = HTC.Utils.GetCurlCommand(resp);
+                System.Media.SystemSounds.Asterisk.Play();
+                return;
+            }
+
+            var package_url = resp.intent[0].data_uri;
+            var package_filename = resp.intent[0].pkgFileName;
+
+            var result = MessageBox.Show(package_filename, "Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk);
+            if (result != DialogResult.OK)
+            {
+                button_get_info.Enabled = true;
+                return;
+            }
+
+            web = HTC.Utils.Download(resp);
+
+            web.DownloadProgressChanged += (_s, _e) =>
+            {
+                progressBar.Value = _e.ProgressPercentage;
+                this.Text = $"[{progressBar.Value}%] {package_filename}";
+            };
+            web.DownloadFileCompleted += (_s, _e) =>
+            {
+                this.Text = "HTC OTA Downloader";
+                button_get_info.Tag = button_get_info.Text = "GET";
+                System.Media.SystemSounds.Asterisk.Play();
+                progressBar.Value = 0;
+                if (_e.Cancelled) File.Delete(package_filename);
+            };
+            web.DownloadFileAsync(new Uri(package_url), package_filename);
+            button_get_info.Tag = button_get_info.Text = "STOP";
         }
 
-        private void text_dl_log_TextChanged(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(text_dl_log.Text))
-            {
-                text_dl_log.Text = text_dl_log.Text
-                    .Replace("[{", "[\r\n{")
-                    .Replace("}]", "}\r\n]")
-                    .Replace("{\"", "{\r\n\"")
-                    .Replace("\"}", "\"\r\n}")
-                    .Replace(",\"", ",\r\n\"")
-                    .Replace(",{", ",\r\n{")
-                    .Replace("\"},", "\"\r\n},");
-            }
-        }
-
-        private void text_dl_info_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyData == Keys.Enter)
-            {
-                ActiveControl = button_dl_get;
-                button_dl_get_Click(sender, e);
-            }
-        }
-
-        private async void button_bfc_check_Click(object sender, EventArgs e)
+        private async void Button_bfc_check_Click(object sender, EventArgs e)
         {
             if (button_bfc_check.Tag.ToString() == "Suspend")
             {
@@ -134,31 +130,22 @@ namespace HTC_OTA_Downloader
             }
 
             var model = text_bfc_model.Text;
+            var cidnum = text_bfc_cid.Text;
+            var main = text_bfc_main.Text;
             var sku = text_bfc_sku.Text;
-            var cidnum = text_bfc_cidnum.Text;
+            var locale = text_device_locale.Text;
+            var sku_int = int.Parse(sku, NumberStyles.Integer);
+            var isChina = (sku_int >= 1400 && sku_int <= 1405);
 
             if (string.IsNullOrEmpty(model) || string.IsNullOrEmpty(sku) || string.IsNullOrEmpty(cidnum))
             {
-                text_bfc_log.Text = "Error: device informations are required!";
+                text_main.Text = "Error: Important device informations are missing!";
                 System.Media.SystemSounds.Asterisk.Play();
                 return;
             }
-
-            if (!sku.Contains(":"))
-            {
-                text_bfc_log.Text = "Error: SKU field should be this format X:XXXX";
-                System.Media.SystemSounds.Asterisk.Play();
-                return;
-            }
-
-            var head_ver = sku.Split(':')[0];
-            var sku_str = sku.Split(':')[1];
-
-            var sku_int = int.Parse(sku_str, System.Globalization.NumberStyles.Integer);
-            var isChina = (sku_int >= 1400 && sku_int <= 1405);
 
             button_bfc_check.Tag = button_bfc_check.Text = "Suspend";
-            text_bfc_log.Text = "";
+            text_main.Text = "";
 
             var is_Suspend = false;
 
@@ -172,31 +159,31 @@ namespace HTC_OTA_Downloader
                         break;
                     }
 
-                    var version = $"{head_ver}.{i.ToString("D2")}.{sku_str}.{j}";
+                    var version = $"{main}.{i.ToString("D2")}.{sku}.{j}";
                     var str = $"{model}\t{version}\t{cidnum}";
 
                     this.Text = $"Brute-Force: {str.Replace("\t", " / ")}";
-                    text_bfc_log.AppendText($"Check: {str}\r\n");
+                    text_main.AppendText($"Check: {str}\r\n");
 
-                    var json = await Task.Run(() => Funcs.CheckinJson(isChina, model, version, cidnum));
-                    var obj = serializer.Deserialize<Response>(json);
+                    var json = await Task.Run(() => HTC.Utils.CheckinJson(model, version, cidnum, "", locale, isChina));
+                    var resp = HTC.Json.GetResponseObject(json);
 
-                    if (obj.intent != null && obj.reason != null)
+                    if (resp.intent != null && resp.reason != null)
                     {
-                        Config.BFC_Save(model, sku, cidnum);
-                        if (obj.reason == "FOTACANCEL_NO_MATCH_PRODUCT")
+                        HTC.Config.BFC_Save(model, main, sku, cidnum);
+                        if (resp.reason == "FOTACANCEL_NO_MATCH_PRODUCT")
                         {
-                            text_bfc_log.Text = "Error: Model name not vaild!";
+                            text_main.Text = "Error: Model name not vaild!";
                             is_Suspend = true;
                         }
-                        if (obj.reason == "FOTACANCEL_NO_MATCH_SKU")
+                        if (resp.reason == "FOTACANCEL_NO_MATCH_SKU")
                         {
-                            text_bfc_log.Text = "Error: SKU not vaild!";
+                            text_main.Text = "Error: SKU not vaild!";
                             is_Suspend = true;
                         }
-                        if (obj.reason == "FOTAUPDATE_NO_ERROR")
+                        if (resp.reason == "FOTAUPDATE_NO_ERROR")
                         {
-                            text_bfc_log.Text = $"Found: {model} / {version} / {cidnum}";
+                            text_main.Text = $"Found: {model} / {version} / {cidnum}";
                             is_Suspend = true;
                         }
                     }
@@ -207,7 +194,7 @@ namespace HTC_OTA_Downloader
 
             if (!is_Suspend)
             {
-                text_bfc_log.Text = "No OTA package found!";
+                text_main.Text = "No OTA package found!";
             }
 
             this.Text = "HTC OTA Downloader";
@@ -215,12 +202,21 @@ namespace HTC_OTA_Downloader
             System.Media.SystemSounds.Asterisk.Play();
         }
 
-        private void text_bfc_info_KeyDown(object sender, KeyEventArgs e)
+        private void KeyDown_Download(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.Enter)
+            {
+                ActiveControl = button_get_info;
+                Button_get_info_Click(sender, e);
+            }
+        }
+
+        private void KeyDown_Bruteforce(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
             {
                 ActiveControl = button_bfc_check;
-                button_bfc_check_Click(sender, e);
+                Button_bfc_check_Click(sender, e);
             }
         }
     }

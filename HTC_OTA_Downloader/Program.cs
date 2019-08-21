@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace HTC_OTA_Downloader
+namespace HTCFZ.HTC_OTA_Downloader
 {
     static class Program
     {

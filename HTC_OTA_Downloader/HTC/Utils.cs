@@ -7,21 +7,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
-namespace HTC_OTA_Downloader
+namespace HTC
 {
-    class Funcs
+    class Utils
     {
-        static long TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         static string CHECKIN_URL = "https://andchin-2.htc.com/htcfotacheckin/rest/checkin";
         static string CHECKIN_URL_CN = "https://andchin-2.htccomm.com.cn/htcfotacheckin/rest/checkin";
-        public static JavaScriptSerializer serializer = new JavaScriptSerializer();
-        static FakeDevice Device;
 
-        public static string CheckinJson(bool isChina, string model, string version, string cidnum)
+        static Device device;
+
+        public static string CheckinJson(string model, string version, string cidnum, string taskid, string locale, bool isChina = false)
         {
-            Device = new FakeDevice();
+            device = new Device();
             using (var web = new WebClient())
             {
+                web.Encoding = Encoding.UTF8;
+
                 var headers = new WebHeaderCollection();
                 headers.Add(HttpRequestHeader.UserAgent, "Android-Checkin/8.0");
                 headers.Add(HttpRequestHeader.ContentType, "application/json");
@@ -29,27 +30,30 @@ namespace HTC_OTA_Downloader
                 web.Headers = headers;
 
                 var obj = new Request();
-                obj.imei = Device.IMEI;
-                obj.timeStamp = TimeStamp;
+                obj.timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                obj.locale = locale;
+                obj.imei = device.IMEI;
                 obj.model_number = model;
-                obj.checkin.build.serialno = Device.SN;
-                obj.checkin.build.firmware_version = version;
                 obj.checkin.cid = cidnum;
-                obj.x1 = getX1();
+                obj.checkin.build.serialno = device.SN;
+                obj.checkin.build.firmware_version = version;
+                obj.checkin.build.build_taskid = taskid;
+                obj.x1 = getX1(device.SN, device.IMEI, obj.timeStamp);
 
-                var post_string = serializer.Serialize(obj);
+                var post_string = Json.GetRequestString(obj);
                 var url = isChina ? CHECKIN_URL_CN : CHECKIN_URL;
 
                 return web.UploadString(url, post_string);
             }
         }
 
-        public static WebClient DonwloadPackage(Response obj)
+        public static WebClient Download(Response obj)
         {
             var web = new WebClient();
+            web.Encoding = Encoding.UTF8;
             var headers = new WebHeaderCollection();
             headers.Add(HttpRequestHeader.UserAgent, "Android-Checkin/8.0");
-            headers.Add("htc1s", getHTC1S(long.Parse(obj.time_msec)));
+            headers.Add("htc1s", getHTC1S(device.SN, long.Parse(obj.time_msec)));
             web.Headers = headers;
             return web;
         }
@@ -60,15 +64,15 @@ namespace HTC_OTA_Downloader
             var pkg = obj.intent[0].pkgFileName;
 
             var curl = "curl -H \"User-Agent: Android-Checkin/8.0\"";
-            curl += $" -H \"htc1s: {getHTC1S(long.Parse(obj.time_msec))}\"";
+            curl += $" -H \"htc1s: {getHTC1S(device.SN, long.Parse(obj.time_msec))}\"";
             curl += $" \"{url}\" -o \"{pkg}\"";
 
             return curl;
         }
 
-        private static string getX1()
+        private static string getX1(string SN, string IMEI, long timestamp)
         {
-            string time = TimeStamp.ToString();
+            string time = timestamp.ToString();
             int shift_value = 0;
             for (int i = 4; i <= time.Length; i++)
             {
@@ -80,12 +84,12 @@ namespace HTC_OTA_Downloader
             }
             var time_head = time.Substring(0, time.Length - shift_value);
             var time_tail = time.Substring(time.Length - shift_value);
-            return sha256(time_tail + Device.SN + Device.IMEI + time_head);
+            return sha256(time_tail + SN + IMEI + time_head);
         }
 
-        public static string getHTC1S(long timestamp)
+        private static string getHTC1S(string SN, long timestamp)
         {
-            var htc1s = Device.SN + timestamp;
+            var htc1s = SN + timestamp;
             if (timestamp <= 0) return htc1s;
             for (long i = timestamp % 10; ; i = timestamp % 10)
             {
